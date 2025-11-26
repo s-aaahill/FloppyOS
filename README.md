@@ -32,22 +32,27 @@ This project is purely for learning how an OS works under the hood.
 
 ```bash
 make
+```
+
 💻 Run (QEMU)
+```
 make run
 
-
+```
 If make run fails, you can manually do:
-
+```
 qemu-system-i386 -cdrom build/FloppyOS.iso
+```
 
 📂 Project Structure
+```
 FloppyOS/
 │
 ├── src/             # kernel + drivers
 ├── build/           # compiled binaries + ISO (ignored by git)
 ├── Makefile
 └── linker.ld
-
+```
 🎯 Goals (Future)
 
 Basic keyboard driver
@@ -71,8 +76,6 @@ This project is open to learn from — use, modify, and experiment freely.
 - Press `Ctrl + X`
 
 ---
-
-## 🔐 Add, commit, and push to GitHub
 
 ```bash
 git add README.md
