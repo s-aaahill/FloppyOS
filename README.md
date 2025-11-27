@@ -59,6 +59,7 @@ Install these (Linux / Ubuntu):
 ```bash
 sudo apt update
 sudo apt install nasm make qemu-system-x86 bochs bochs-sdl
+```
 Open Watcom Requirement
 FloppyOS needs Open Watcom v2 as the C compiler.
 It must exist on your system.
@@ -66,25 +67,27 @@ It must exist on your system.
 The Makefile expects Watcom here by default:
 
 swift
-Copy code
+```
 /usr/bin/watcom/binl/wcc
+```
 If yours is installed somewhere else (like /opt/watcom), then edit the top of your Makefile:
 
 make
-Copy code
 # Edit paths based on your installation
+```
 WATCOM = /opt/watcom
 CC     = $(WATCOM)/binl/wcc
+```
 Or set a symlink to avoid editing:
 
+```
 bash
-Copy code
+
 sudo ln -s /opt/watcom /usr/bin/watcom
+```
 ▶️ Build & Run
 🏗️ Build
-bash
-Copy code
-make
+
 This will:
 
 Assemble boot + kernel sources
@@ -97,28 +100,34 @@ Produce a bootable .img
 
 If you get:
 
+```
 swift
-Copy code
+
 make[1]: /usr/bin/watcom/binl/wcc: No such file or directory
 → Fix the Watcom path as shown above.
+```
 
 ▶️ Run in QEMU
+```
 bash
-Copy code
 make run
+```
 If that fails, manually:
 
+```
 bash
-Copy code
 qemu-system-i386 -fda test.img
+```
 (Replace with your own build image if different.)
 
 🐞 Debug in Bochs (optional)
 Use the provided Bochs config:
 
+```
 bash
-Copy code
 ./debug.sh
+```
+
 If Bochs can’t find the floppy, open bochs_config and update the path.
 
 🧠 Learning Outcomes
