@@ -1,83 +1,156 @@
-# 🧠 FloppyOS
+# FloppyOS 🧵
 
-FloppyOS is a minimal hobby operating system written in C/C++ with a bit of assembly.  
-It boots from GRUB, enters 32-bit protected mode, and prints to the VGA text buffer.  
-This project is purely for learning how an OS works under the hood.
-
----
-
-## 🚀 Features (Current)
-
-- Boots using GRUB (Multiboot)
-- 32-bit kernel written in C/C++
-- Minimal assembly for entry
-- Text mode output (VGA `0xB8000`)
-- Runs on QEMU or VirtualBox
+FloppyOS is a tiny hobby operating system that boots from a floppy image, switches to 32-bit protected mode and prints to the VGA text buffer.  
+It’s not meant to be “usable”; it’s a playground to learn how an OS actually boots and runs on bare metal.
 
 ---
 
-## 🛠️ Tech Used
+## ✨ Current Features
 
-- **C / C++ (freestanding)**
-- **NASM**
-- **GRUB (Multiboot)**
-- **LD (linker script)**
-- **QEMU** for testing
+- Boots from a floppy image (sample image included in the repo)
+- Multistage boot process:
+  - 16-bit boot code (floppy)
+  - 32-bit C kernel
+- Switches to 32-bit Protected Mode
+- Prints directly to VGA text buffer at `0xB8000`
+- Builds using **Open Watcom** (C) + **NASM** (Assembly)
+- Runs in emulator (QEMU / Bochs)
 
 ---
 
-## ▶️ How to Build & Run
+## 🧱 Tech Stack
 
-### 🔧 Build
+| Component        | Tool |
+|------------------|------|
+| OS Language       | Assembly (boot), C (kernel) |
+| C Compiler        | Open Watcom v2 |
+| Assembler         | NASM |
+| Emulator / Debug  | QEMU / Bochs |
+| Build System      | Make + custom floppy builder |
+
+---
+
+## 📁 Project Structure
+
+FloppyOS/
+├── src/ # Kernel + boot/low-level code (C + ASM)
+│
+├── tools/
+│ └── fat/ # Helper tools for building the disk image
+│
+├── test.img # Sample floppy image (for immediate testing)
+├── bochs_config # Configuration file for Bochs
+├── Makefile # Main build script
+├── run.sh # Run the built OS in QEMU
+├── debug.sh # Debug OS in Bochs
+└── README.md
+
+yaml
+Copy code
+
+---
+
+## 🔧 Requirements
+
+### Software Needed
+
+Install these (Linux / Ubuntu):
 
 ```bash
+sudo apt update
+sudo apt install nasm make qemu-system-x86 bochs bochs-sdl
+Open Watcom Requirement
+FloppyOS needs Open Watcom v2 as the C compiler.
+It must exist on your system.
+
+The Makefile expects Watcom here by default:
+
+swift
+Copy code
+/usr/bin/watcom/binl/wcc
+If yours is installed somewhere else (like /opt/watcom), then edit the top of your Makefile:
+
 make
-```
+Copy code
+# Edit paths based on your installation
+WATCOM = /opt/watcom
+CC     = $(WATCOM)/binl/wcc
+Or set a symlink to avoid editing:
 
-💻 Run (QEMU)
-```
+bash
+Copy code
+sudo ln -s /opt/watcom /usr/bin/watcom
+▶️ Build & Run
+🏗️ Build
+bash
+Copy code
+make
+This will:
+
+Assemble boot + kernel sources
+
+Link the kernel
+
+Build/update the floppy image
+
+Produce a bootable .img
+
+If you get:
+
+swift
+Copy code
+make[1]: /usr/bin/watcom/binl/wcc: No such file or directory
+→ Fix the Watcom path as shown above.
+
+▶️ Run in QEMU
+bash
+Copy code
 make run
+If that fails, manually:
 
-```
-If make run fails, you can manually do:
-```
-qemu-system-i386 -cdrom build/FloppyOS.iso
-```
+bash
+Copy code
+qemu-system-i386 -fda test.img
+(Replace with your own build image if different.)
 
-📂 Project Structure
-```
-FloppyOS/
-│
-├── src/             # kernel + drivers
-├── build/           # compiled binaries + ISO (ignored by git)
-├── Makefile
-└── linker.ld
-```
-🎯 Goals (Future)
+🐞 Debug in Bochs (optional)
+Use the provided Bochs config:
 
-Basic keyboard driver
+bash
+Copy code
+./debug.sh
+If Bochs can’t find the floppy, open bochs_config and update the path.
 
-Simple shell
+🧠 Learning Outcomes
+From this project you can learn:
 
-Memory management (paging)
+How BIOS boot happens on x86
 
-File system (custom or FAT12)
+How a floppy bootloader works
+
+How to switch from 16-bit real mode → 32-bit protected mode
+
+How to write freestanding C (without libc)
+
+How to write text to VGA memory
+
+How to build a bootable OS image manually
+
+🗺️ Roadmap Ideas
+ Implement basic keyboard input
+
+ Add a basic terminal/shell
+
+ GDT/IDT setup improvements
+
+ Paging / Memory Manager
+
+ Simple filesystem (FAT12 or custom)
+
+ More drivers (timer, disk, etc.)
 
 📜 License
+This is an educational hobby OS project.
+You are free to study, change, experiment, and copy code for learning purposes.
+Attribution is appreciated but not required.
 
-This project is open to learn from — use, modify, and experiment freely.
-
-
----
-
-### 💾 Save the file
-
-- Press `Ctrl + O` → Enter
-- Press `Ctrl + X`
-
----
-
-```bash
-git add README.md
-git commit -m "Added README"
-git push
