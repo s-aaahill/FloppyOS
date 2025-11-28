@@ -1,165 +1,140 @@
+Based on the current state of the repository, I have drafted an updated and corrected `README.md`.
+
+This version fixes the formatting errors (like the accidental "yaml Copy code" text), accurately reflects the file structure (adding `test.txt` and clarifying the `tools` folder), and polishes the instructions for clarity.
+
+### Updated `README.md`
+
+````markdown
 # FloppyOS 🧵
 
-FloppyOS is a tiny hobby operating system that boots from a floppy image, switches to 32-bit protected mode and prints to the VGA text buffer.  
+FloppyOS is a tiny hobby operating system that boots from a floppy image, switches to 32-bit protected mode, and prints to the VGA text buffer.
+
 It’s not meant to be “usable”; it’s a playground to learn how an OS actually boots and runs on bare metal.
 
 ---
 
 ## ✨ Current Features
 
-- Boots from a floppy image (sample image included in the repo)
-- Multistage boot process:
-  - 16-bit boot code (floppy)
-  - 32-bit C kernel
-- Switches to 32-bit Protected Mode
-- Prints directly to VGA text buffer at `0xB8000`
-- Builds using **Open Watcom** (C) + **NASM** (Assembly)
-- Runs in emulator (QEMU / Bochs)
+* **Bootloader**: Boots from a floppy image (16-bit real mode).
+* **Protected Mode**: Switches to 32-bit Protected Mode.
+* **Kernel**: Minimal C kernel compiled with Open Watcom.
+* **VGA Driver**: Prints directly to VGA text buffer at `0xB8000`.
+* **Build System**: Automates the build process with `Make` and custom tools.
+* **Simulation**: Runs easily in QEMU or Bochs.
 
 ---
 
 ## 🧱 Tech Stack
 
-| Component        | Tool |
-|------------------|------|
-| OS Language       | Assembly (boot), C (kernel) |
-| C Compiler        | Open Watcom v2 |
-| Assembler         | NASM |
-| Emulator / Debug  | QEMU / Bochs |
-| Build System      | Make + custom floppy builder |
+| Component | Tool |
+| :--- | :--- |
+| **OS Language** | Assembly (boot), C (kernel) |
+| **C Compiler** | Open Watcom v2 |
+| **Assembler** | NASM |
+| **Emulator** | QEMU / Bochs |
+| **Build** | Make + custom FAT tools |
 
 ---
 
 ## 📁 Project Structure
 
+```text
 FloppyOS/
-├── src/ # Kernel + boot/low-level code (C + ASM)
-│
+├── src/            # Kernel + boot/low-level code (C + ASM)
 ├── tools/
-│ └── fat/ # Helper tools for building the disk image
-│
-├── test.img # Sample floppy image (for immediate testing)
-├── bochs_config # Configuration file for Bochs
-├── Makefile # Main build script
-├── run.sh # Run the built OS in QEMU
-├── debug.sh # Debug OS in Bochs
-└── README.md
+│   └── fat/        # Helper tools for building the FAT disk image
+├── test.img        # Sample floppy image (for immediate testing)
+├── test.txt        # Sample text file for filesystem testing
+├── bochs_config    # Configuration file for Bochs
+├── Makefile        # Main build script
+├── run.sh          # Helper script to run the OS in QEMU
+├── debug.sh        # Helper script to debug the OS in Bochs
+└── README.md       # This documentation
+````
 
-yaml
-Copy code
-
----
+-----
 
 ## 🔧 Requirements
 
-### Software Needed
-
-Install these (Linux / Ubuntu):
+### Software Needed (Linux / Ubuntu)
 
 ```bash
 sudo apt update
 sudo apt install nasm make qemu-system-x86 bochs bochs-sdl
 ```
-Open Watcom Requirement
-FloppyOS needs Open Watcom v2 as the C compiler.
-It must exist on your system.
 
-The Makefile expects Watcom here by default:
+### Open Watcom v2
 
-swift
-```
-/usr/bin/watcom/binl/wcc
-```
-If yours is installed somewhere else (like /opt/watcom), then edit the top of your Makefile:
+FloppyOS relies on **Open Watcom v2** for C compilation because of its distinct calling conventions suitable for this OS structure.
 
-make
-# Edit paths based on your installation
-```
-WATCOM = /opt/watcom
+The `Makefile` defaults to:
+
+```makefile
+WATCOM = /usr/bin/watcom
 CC     = $(WATCOM)/binl/wcc
 ```
-Or set a symlink to avoid editing:
 
-```
-bash
+If your installation is different (e.g., `/opt/watcom`), you can either:
 
-sudo ln -s /opt/watcom /usr/bin/watcom
-```
-▶️ Build & Run
-🏗️ Build
+1.  Edit the `Makefile` paths.
+2.  Create a symlink: `sudo ln -s /opt/watcom /usr/bin/watcom`
 
-This will:
+-----
 
-Assemble boot + kernel sources
+## ▶️ Build & Run
 
-Link the kernel
+### 🏗️ Build
 
-Build/update the floppy image
+Compile the bootloader, kernel, and generate the floppy image:
 
-Produce a bootable .img
-
-If you get:
-
-```
-swift
-
-make[1]: /usr/bin/watcom/binl/wcc: No such file or directory
-→ Fix the Watcom path as shown above.
+```bash
+make
 ```
 
-▶️ Run in QEMU
-```
-bash
+### 🚀 Run (QEMU)
+
+To boot the OS in QEMU:
+
+```bash
 make run
-```
-If that fails, manually:
-
-```
-bash
+# OR manually:
 qemu-system-i386 -fda test.img
 ```
-(Replace with your own build image if different.)
 
-🐞 Debug in Bochs (optional)
-Use the provided Bochs config:
+### 🐞 Debug (Bochs)
 
-```
-bash
+To run with the Bochs debugger (using the included `bochs_config`):
+
+```bash
 ./debug.sh
 ```
 
-If Bochs can’t find the floppy, open bochs_config and update the path.
+-----
 
-🧠 Learning Outcomes
-From this project you can learn:
+## 🧠 Learning Outcomes
 
-How BIOS boot happens on x86
+  * BIOS boot process on x86
+  * Writing a floppy bootloader (Boot Sector)
+  * Real Mode (16-bit) → Protected Mode (32-bit) transition
+  * Freestanding C programming (no `libc`)
+  * VGA text mode memory manipulation (`0xB8000`)
+  * Manual OS image construction
 
-How a floppy bootloader works
+-----
 
-How to switch from 16-bit real mode → 32-bit protected mode
+## 🗺️ Roadmap Ideas
 
-How to write freestanding C (without libc)
+  * [ ] Basic keyboard input driver
+  * [ ] Simple terminal/shell
+  * [ ] GDT/IDT setup improvements
+  * [ ] Paging / Memory Management
+  * [ ] FAT12 Filesystem implementation (WIP in `tools/fat`)
+  * [ ] Additional drivers (Timer, Disk, etc.)
 
-How to write text to VGA memory
+-----
 
-How to build a bootable OS image manually
+## 📜 License
 
-🗺️ Roadmap Ideas
- Implement basic keyboard input
-
- Add a basic terminal/shell
-
- GDT/IDT setup improvements
-
- Paging / Memory Manager
-
- Simple filesystem (FAT12 or custom)
-
- More drivers (timer, disk, etc.)
-
-📜 License
 This is an educational hobby OS project.
 You are free to study, change, experiment, and copy code for learning purposes.
 Attribution is appreciated but not required.
-
