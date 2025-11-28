@@ -1,10 +1,3 @@
-Based on the current state of the repository, I have drafted an updated and corrected `README.md`.
-
-This version fixes the formatting errors (like the accidental "yaml Copy code" text), accurately reflects the file structure (adding `test.txt` and clarifying the `tools` folder), and polishes the instructions for clarity.
-
-### Updated `README.md`
-
-````markdown
 # FloppyOS 🧵
 
 FloppyOS is a tiny hobby operating system that boots from a floppy image, switches to 32-bit protected mode, and prints to the VGA text buffer.
