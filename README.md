@@ -1,133 +1,149 @@
-# FloppyOS 🧵
+# FloppyOS
 
-FloppyOS is a tiny hobby operating system that boots from a floppy image, switches to 32-bit protected mode, and prints to the VGA text buffer.
+**Tiny hobby operating system that boots from a floppy image, switches to 32-bit protected mode, and writes text to VGA memory.**
 
-It’s not meant to be “usable”; it’s a playground to learn how an OS actually boots and runs on bare metal.
-
----
-
-## ✨ Current Features
-
-* **Bootloader**: Boots from a floppy image (16-bit real mode).
-* **Protected Mode**: Switches to 32-bit Protected Mode.
-* **Kernel**: Minimal C kernel compiled with Open Watcom.
-* **VGA Driver**: Prints directly to VGA text buffer at `0xB8000`.
-* **Build System**: Automates the build process with `Make` and custom tools.
-* **Simulation**: Runs easily in QEMU or Bochs.
+> This repository exists for learning OS dev basics: real mode → protected mode, freestanding C, custom GCC toolchain, floppy images, and simple hardware interaction.
 
 ---
 
-## 🧱 Tech Stack
+## ✨ Features
 
-| Component | Tool |
-| :--- | :--- |
-| **OS Language** | Assembly (boot), C (kernel) |
-| **C Compiler** | Open Watcom v2 |
-| **Assembler** | NASM |
-| **Emulator** | QEMU / Bochs |
-| **Build** | Make + custom FAT tools |
+* **Bootloader** — 16‑bit real‑mode boot sector
+* **Protected Mode** — sets up GDT and switches to 32‑bit mode
+* **Freestanding Kernel (C + ASM)** — compiled with your custom `i686-elf-gcc` toolchain
+* **VGA Text Output** — writes directly to `0xB8000`
+* **Floppy Image Build System** — generates a FAT12-compatible `test.img`
+* **Emulator Support** — run using QEMU or Bochs
 
 ---
 
-## 📁 Project Structure
+## 📁 Repository Structure
 
-```text
+```
 FloppyOS/
-├── src/            # Kernel + boot/low-level code (C + ASM)
-├── tools/
-│   └── fat/        # Helper tools for building the FAT disk image
-├── test.img        # Sample floppy image (for immediate testing)
-├── test.txt        # Sample text file for filesystem testing
-├── bochs_config    # Configuration file for Bochs
-├── Makefile        # Main build script
-├── run.sh          # Helper script to run the OS in QEMU
-├── debug.sh        # Helper script to debug the OS in Bochs
-└── README.md       # This documentation
-````
+├── src/              # Kernel + low-level ASM
+│   ├── boot/         # Bootloader code
+│   └── kernel/       # C kernel source
+├── tools/            # FAT12 image creation helpers
+│   └── fat/
+├── toolchain/        # Custom-built i686-elf GCC toolchain
+├── test.img          # Generated floppy image
+├── bochs_config      # Config for Bochs debugging
+├── Makefile          # Build system
+├── run.sh            # QEMU run script
+├── debug.sh          # Bochs run script
+└── README.md         # This file
+```
 
------
+---
 
-## 🔧 Requirements
+## 🔧 Requirements (Linux / Ubuntu)
 
-### Software Needed (Linux / Ubuntu)
+Install basic build tools:
 
 ```bash
 sudo apt update
-sudo apt install nasm make qemu-system-x86 bochs bochs-sdl
+sudo apt install -y nasm make qemu-system-i386 bochs bochs-sdl
 ```
 
-### Open Watcom v2
+This project uses **your own GCC cross-compiler**, built in the `toolchain/` directory.
 
-FloppyOS relies on **Open Watcom v2** for C compilation because of its distinct calling conventions suitable for this OS structure.
+---
 
-The `Makefile` defaults to:
+## 🛠 GCC Cross-Compiler (Custom Toolchain)
 
-```makefile
-WATCOM = /usr/bin/watcom
-CC     = $(WATCOM)/binl/wcc
+The Makefile expects binaries at:
+
+```
+./toolchain/bin/i686-elf-gcc
+./toolchain/bin/i686-elf-ld
 ```
 
-If your installation is different (e.g., `/opt/watcom`), you can either:
+Set the compiler variables accordingly:
 
-1.  Edit the `Makefile` paths.
-2.  Create a symlink: `sudo ln -s /opt/watcom /usr/bin/watcom`
+```
+CC = ./toolchain/bin/i686-elf-gcc
+AS = nasm
+LD = ./toolchain/bin/i686-elf-ld
+```
 
------
+Ensure the binaries are executable:
 
-## ▶️ Build & Run
+```bash
+chmod +x toolchain/bin/*
+```
 
-### 🏗️ Build
+---
 
-Compile the bootloader, kernel, and generate the floppy image:
+## 🚀 Build & Run
+
+### Build the OS
 
 ```bash
 make
 ```
 
-### 🚀 Run (QEMU)
+This produces the final floppy image:
 
-To boot the OS in QEMU:
+```
+test.img
+```
+
+### Run on QEMU
 
 ```bash
 make run
-# OR manually:
+# or
 qemu-system-i386 -fda test.img
 ```
 
-### 🐞 Debug (Bochs)
-
-To run with the Bochs debugger (using the included `bochs_config`):
+### Debug with Bochs
 
 ```bash
 ./debug.sh
 ```
 
------
+---
 
-## 🧠 Learning Outcomes
+## 📝 Development Notes
 
-  * BIOS boot process on x86
-  * Writing a floppy bootloader (Boot Sector)
-  * Real Mode (16-bit) → Protected Mode (32-bit) transition
-  * Freestanding C programming (no `libc`)
-  * VGA text mode memory manipulation (`0xB8000`)
-  * Manual OS image construction
+* This is a **freestanding** kernel → no libc, no OS services.
+* VGA memory (`0xB8000`) is used for debug/console text.
+* File system helpers inside `tools/fat` allow embedding files into `test.img`.
+* If you modify the toolchain location, update paths in the Makefile.
 
------
+---
 
-## 🗺️ Roadmap Ideas
+## 📌 Roadmap
 
-  * [ ] Basic keyboard input driver
-  * [ ] Simple terminal/shell
-  * [ ] GDT/IDT setup improvements
-  * [ ] Paging / Memory Management
-  * [ ] FAT12 Filesystem implementation (WIP in `tools/fat`)
-  * [ ] Additional drivers (Timer, Disk, etc.)
+* Keyboard input driver
+* Better terminal interface
+* Proper GDT/IDT separation
+* Paging and memory management
+* FAT12 improvements + file loading
+* PIT timer + IRQ handling
 
------
+---
 
-## 📜 License
+## 🤝 Contributing
 
-This is an educational hobby OS project.
-You are free to study, change, experiment, and copy code for learning purposes.
-Attribution is appreciated but not required.
+1. Fork the repo
+2. Create a feature branch:
+
+   ```bash
+   git checkout -b feature/my-change
+   ```
+3. Test changes using QEMU or Bochs
+4. Commit & push, then open a pull request
+
+---
+
+## 📄 License
+
+For educational use. Attribution appreciated but not required.
+
+---
+
+## 📬 Contact
+
+Open an issue on GitHub for questions or discussions.
