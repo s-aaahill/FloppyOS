@@ -10,7 +10,10 @@
 
 * **Bootloader** — 16‑bit real‑mode boot sector
 * **Protected Mode** — sets up GDT and switches to 32‑bit mode
+* **GDT & IDT** — Global Descriptor Table & Interrupt Descriptor Table setup
+* **HAL** — Hardware Abstraction Layer initialization
 * **Freestanding Kernel (C + ASM)** — compiled with your custom `i686-elf-gcc` toolchain
+* **Standard Library Support** — subset implementation (printf, puts, memory operations)
 * **VGA Text Output** — writes directly to `0xB8000`
 * **Floppy Image Build System** — generates a FAT12-compatible `test.img`
 * **Emulator Support** — run using QEMU or Bochs
@@ -24,6 +27,9 @@ FloppyOS/
 ├── src/              # Kernel + low-level ASM
 │   ├── boot/         # Bootloader code
 │   └── kernel/       # C kernel source
+│       ├── arch/     # Architecture specific code (GDT, IDT, IO)
+│       ├── hal/      # Hardware Abstraction Layer
+│       └── util/     # Utilities
 ├── tools/            # FAT12 image creation helpers
 │   └── fat/
 ├── toolchain/        # Custom-built i686-elf GCC toolchain
@@ -118,7 +124,6 @@ qemu-system-i386 -fda test.img
 
 * Keyboard input driver
 * Better terminal interface
-* Proper GDT/IDT separation
 * Paging and memory management
 * FAT12 improvements + file loading
 * PIT timer + IRQ handling
