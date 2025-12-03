@@ -14,7 +14,7 @@ void __attribute__((section(".entry"))) start(uint16_t bootDrive)
 
     clrscr();
 
-    printf("Control Flow in Kernel\nFloppyOS under development!!!\nCompleted till here on 3rd December 2025\n");
+    printf("Control Flow in Kernel\nFloppyOS under development!!!\nCompleted till here on 4th December 2025\n");
 
 end:
     for (;;);
