@@ -33,7 +33,8 @@ FloppyOS/
 ├── tools/            # FAT12 image creation helpers
 │   └── fat/
 ├── toolchain/        # Custom-built i686-elf GCC toolchain
-├── test.img          # Generated floppy image
+├── build/            # Build artifacts
+│   └── main_floppy.img # Generated floppy image
 ├── bochs_config      # Config for Bochs debugging
 ├── Makefile          # Build system
 ├── run.sh            # QEMU run script
@@ -52,7 +53,7 @@ sudo apt update
 sudo apt install -y nasm make qemu-system-i386 bochs bochs-sdl
 ```
 
-This project uses **your own GCC cross-compiler**, built in the `toolchain/` directory.
+This project uses **Own built GCC cross-compiler**, built in the `toolchain/` directory.
 
 ---
 
@@ -61,22 +62,22 @@ This project uses **your own GCC cross-compiler**, built in the `toolchain/` dir
 The Makefile expects binaries at:
 
 ```
-./toolchain/bin/i686-elf-gcc
-./toolchain/bin/i686-elf-ld
+./toolchain/i686-elf/bin/i686-elf-gcc
+./toolchain/i686-elf/bin/i686-elf-ld
 ```
 
 Set the compiler variables accordingly:
 
 ```
-CC = ./toolchain/bin/i686-elf-gcc
+CC = ./toolchain/i686-elf/bin/i686-elf-gcc
 AS = nasm
-LD = ./toolchain/bin/i686-elf-ld
+LD = ./toolchain/i686-elf/bin/i686-elf-ld
 ```
 
 Ensure the binaries are executable:
 
 ```bash
-chmod +x toolchain/bin/*
+chmod +x toolchain/i686-elf/bin/*
 ```
 
 ---
@@ -92,15 +93,15 @@ make
 This produces the final floppy image:
 
 ```
-test.img
+build/main_floppy.img
 ```
 
 ### Run on QEMU
 
 ```bash
-make run
+./run.sh
 # or
-qemu-system-i386 -fda test.img
+qemu-system-i386 -fda build/main_floppy.img
 ```
 
 ### Debug with Bochs
@@ -115,7 +116,7 @@ qemu-system-i386 -fda test.img
 
 * This is a **freestanding** kernel → no libc, no OS services.
 * VGA memory (`0xB8000`) is used for debug/console text.
-* File system helpers inside `tools/fat` allow embedding files into `test.img`.
+* File system helpers inside `tools/fat` allow embedding files into `build/main_floppy.img`.
 * If you modify the toolchain location, update paths in the Makefile.
 
 ---
