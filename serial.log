@@ -14,7 +14,8 @@ Available commands:
   clear   - Clear screen
   echo    - Print arguments
   reboot  - Reboot system
-sparsh madarchod
+hello world
+Unknown command. Type 'help'.
 Rebooting...
 Boot
 Initializing FB...
