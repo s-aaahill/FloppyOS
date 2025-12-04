@@ -1,7 +1,8 @@
 #include "keyboard.h"
 #include "vga.h"
 #include <arch/i686/io.h>
-#include <arch/i686/irq.h>
+#include <arch/i686/pic.h>
+#include <gui/wm.h>
 #include <arch/i686/idt.h>
 #include <arch/i686/pic.h>
 #include <shell/shell.h>
@@ -23,30 +24,14 @@ static const char g_ScancodeToChar[] = {
 
 void keyboard_process_char(char c)
 {
+    wm_handle_key_event(c);
+    
+    /* Legacy CLI handling
     if (c == '\n' || c == '\r')
     {
         vga_putc('\n');
-        g_LineBuffer[g_LineIndex] = '\0';
-        handle_line(g_LineBuffer);
-        g_LineIndex = 0;
-        vga_puts("FloppyOS> "); 
-    }
-    else if (c == '\b' || c == 127) // Handle backspace and delete
-    {
-        if (g_LineIndex > 0)
-        {
-            vga_putc('\b');
-            g_LineIndex--;
-        }
-    }
-    else
-    {
-        if (g_LineIndex < 255)
-        {
-            vga_putc(c);
-            g_LineBuffer[g_LineIndex++] = c;
-        }
-    }
+    ...
+    */
 }
 
 void keyboard_handler_c(Registers* regs)
@@ -56,6 +41,7 @@ void keyboard_handler_c(Registers* regs)
     // i686_outb(0x20, 0x20); // This is what SendEndofInterrupt does for master PIC.
 
     uint8_t scancode = i686_inb(KEYBOARD_DATA_PORT);
+    // printf("KBD: %x\n", scancode); // Commented out to avoid spam, but useful for debug
 
     if (scancode & 0x80)
     {
@@ -71,7 +57,14 @@ void keyboard_handler_c(Registers* regs)
 
         if (c)
         {
-            keyboard_process_char(c);
+            wm_handle_key_event(c);
+            
+            /* Legacy CLI handling
+            if (c == '\n' || c == '\r')
+            {
+                vga_putc('\n');
+            ...
+            */
         }
     }
 
@@ -83,6 +76,7 @@ extern void isr_keyboard_stub();
 
 void keyboard_init()
 {
+    printf("Keyboard Init...\n");
     // IRQ1 is mapped to interrupt 33 (0x21)
     i686_IDT_SetGate(33, isr_keyboard_stub, 0x08, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_32BIT_INT);
     i686_PIC_Unmask(1);

@@ -71,7 +71,7 @@ clean:
 IMG := build/main_floppy.img
 run:
 	if [ -f $(IMG) ]; then \
-		qemu-system-i386 -fda $(IMG) -boot a -serial file:serial.log ; \
+		qemu-system-i386 -fda $(IMG) -boot a -vga std -serial file:serial.log ; \
 	else \
 		echo "Image not found: $(IMG)"; exit 1; \
 	fi

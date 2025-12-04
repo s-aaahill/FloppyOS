@@ -6,6 +6,9 @@
 #include <arch/i686/io.h>
 #include <drivers/keyboard.h>
 #include <drivers/vga.h>
+#include <drivers/fb.h>
+#include <drivers/ps2mouse.h>
+#include <gui/wm.h>
 
 extern uint8_t __bss_start;
 extern uint8_t __end;
@@ -25,19 +28,40 @@ void __attribute__((section(".entry"))) start(uint16_t bootDrive)
 {
     memset(&__bss_start, 0, (&__end) - (&__bss_start));
 
+    // Direct serial write to verify boot
+    i686_outb(0x3F8, 'B'); i686_outb(0x3F8, 'o'); i686_outb(0x3F8, 'o'); i686_outb(0x3F8, 't'); i686_outb(0x3F8, '\n');
+
     HAL_Initialize();
+    i686_IRQ_RegisterHandler(0, timer);
 
     clrscr();
 
-    //printf("Control Flow in Kernel\nFloppyOS under development!!!\nCompleted till here on 4th December 2025\n");
-    
+    // Initialize GUI
+    printf("Initializing FB...\n");
+    fb_init();
+    printf("Initializing WM...\n");
+    wm_init();
+    printf("Initializing Mouse...\n");
+    mouse_init();
+    printf("Initializing Keyboard...\n");
     keyboard_init();
-    printf("Keyboard initialized.\n");
-    printf("FloppyOS> ");
-
-    i686_IRQ_RegisterHandler(0, timer);
-
-    //crash_me();
+    
+    // Start Apps
+    void notepad_init();
+    notepad_init();
+    
+    void terminal_init();
+    terminal_init();
+    
+    printf("Entering GUI Loop...\n");
+    // Main GUI Loop
+    while (1)
+    {
+        wm_draw_desktop();
+        
+        // Simple delay/yield could go here
+        // For now, just busy loop
+    }
 
 end:
     for (;;);

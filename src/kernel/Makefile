@@ -9,12 +9,12 @@ HEADERS_C = $(wildcard *.h) \
 			$(wildcard */*/*/*.h)
 
 SOURCES_C = $(wildcard *.c) \
-			$(wildcard */*.c) \
-			$(wildcard */*/*.c) \
-			$(wildcard */*/*/*.c) \
-			../drivers/vga.c \
-			../drivers/keyboard.c \
-			../shell/shell.c \
+			$(wildcard arch/i686/*.c) \
+			$(wildcard hal/*.c) \
+			$(wildcard ../drivers/*.c) \
+			$(wildcard ../shell/*.c) \
+			$(wildcard ../gui/*.c) \
+			$(wildcard ../apps/*.c) \
 			arch/i686/isrs_gen.c
 
 OBJECTS_C = $(patsubst %.c, $(BUILD_DIR)/kernel/c/%.obj, $(SOURCES_C))
@@ -25,11 +25,7 @@ HEADERS_ASM = $(wildcard *.inc) \
 			  $(wildcard */*/*/*.inc) \
 			  arch/i686/isrs_gen.inc
 
-SOURCES_ASM = $(wildcard *.asm) \
-			  $(wildcard */*.asm) \
-			  $(wildcard */*/*.asm) \
-			  $(wildcard */*/*/*.asm)
-
+SOURCES_ASM = $(wildcard arch/i686/*.asm)
 
 OBJECTS_ASM = $(patsubst %.asm, $(BUILD_DIR)/kernel/asm/%.obj, $(SOURCES_ASM))
 
