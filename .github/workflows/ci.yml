@@ -1,15 +1,78 @@
-name: CI
+name: CI - build & smoke test
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
-  build:
+  build-and-smoke:
     runs-on: ubuntu-latest
+    env:
+      BUILD_IMAGE: build/main_floppy.img   # <-- change if your Makefile outputs a different path
     steps:
-      - uses: actions/checkout@v4
-      - name: Install deps
-        run: sudo apt update && sudo apt install -y nasm qemu-system-i386 make gcc-multilib
-      - name: Build
-        run: make
-      - name: Smoke run
-        run: qemu-system-i386 -fda build/main_floppy.img -nographic -monitor none -no-reboot -boot a -serial stdio -display none &
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install apt deps
+        run: |
+          sudo apt update -y
+          sudo apt install -y nasm qemu-system-i386 make gcc-multilib binutils
+
+      - name: Use repo-provided toolchain builder (if present)
+        shell: bash
+        run: |
+          if [ -x ./toolchain/build-toolchain.sh ]; then
+            echo "Found build-toolchain.sh — running it"
+            cd toolchain
+            ./build-toolchain.sh || { echo "toolchain build failed"; exit 1; }
+            cd -
+          else
+            echo "No toolchain builder found — skipping"
+          fi
+
+      - name: Build (honors CC/AS/LD env overrides)
+        shell: bash
+        run: |
+          # If you need to override the compiler, set CC in workflow or Make command.
+          echo "Running make (you can override CC/AS/LD)"
+          make -j$(nproc) || { cat Makefile || true; exit 1; }
+
+      - name: Verify build artifact exists
+        shell: bash
+        run: |
+          if [ ! -f "${BUILD_IMAGE}" ]; then
+            echo "ERROR: Expected image not found at ${BUILD_IMAGE}"
+            echo "Listing repo tree for debugging:"
+            ls -la
+            find . -maxdepth 3 -type f -name "*.img" -o -name "*.bin" -o -name "*.iso" || true
+            exit 1
+          fi
+          echo "Found image: ${BUILD_IMAGE}"
+
+      - name: Smoke test image with QEMU (headless for 8s)
+        shell: bash
+        run: |
+          echo "Starting QEMU (headless) to smoke test the image for 8 seconds..."
+          # Launch QEMU in the background, sleep, then ensure it's killed.
+          nohup qemu-system-i386 -fda "${BUILD_IMAGE}" -nographic -monitor none -no-reboot -serial stdio -display none -boot a > qemu.log 2>&1 &
+          QEMU_PID=$!
+          echo "QEMU PID: $QEMU_PID"
+          # give it time to run the bootloader / kernel
+          sleep 8
+          # capture output for logs
+          echo "---- qemu.log (last 200 lines) ----"
+          tail -n 200 qemu.log || true
+          # try to stop QEMU gracefully, then force kill if needed
+          kill $QEMU_PID || true
+          sleep 1
+          kill -9 $QEMU_PID || true
+          echo "QEMU smoke test finished."
+
+      - name: Upload qemu.log (for debugging)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qemu-log
+          path: qemu.log
