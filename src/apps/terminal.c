@@ -2,7 +2,8 @@
 #include <drivers/font.h>
 #include <drivers/fb.h>
 #include <string.h>
-#include <drivers/keyboard.h> // For handle_line
+#include <drivers/keyboard.h>
+#include <drivers/vga.h>
 
 // We need to hook into the shell output.
 // For MVP, we can just maintain a buffer here and have the shell write to it?
@@ -80,25 +81,27 @@ void terminal_paint(Window* win)
 // Forward declaration
 void handle_line(const char* line);
 
+#include <drivers/vga.h>
+
+// ... (rest of includes)
+
+// ... (terminal_write_char implementation)
+
 void terminal_key(Window* win, char c)
 {
     if (c == '\n')
     {
         terminal_write_char('\n');
-        terminal_write_string("> ");
-        terminal_write_string(cmd_buffer);
-        terminal_write_char('\n');
         
         // Execute command
-        // We need to capture output of handle_line.
-        // This is tricky without redirecting stdout.
-        // For MVP, let's just execute it and hope it prints to serial/VGA, 
-        // and maybe we can hook vga_putc to also call terminal_write_char?
-        
         handle_line(cmd_buffer);
         
+        // Reset command buffer
         cmd_index = 0;
         memset(cmd_buffer, 0, 256);
+        
+        // Print new prompt
+        terminal_write_string("> ");
     }
     else if (c == '\b')
     {
@@ -106,6 +109,7 @@ void terminal_key(Window* win, char c)
         {
             cmd_index--;
             cmd_buffer[cmd_index] = '\0';
+            terminal_write_char('\b'); // Visual backspace
         }
     }
     else if (c >= 32 && c <= 126)
@@ -114,13 +118,21 @@ void terminal_key(Window* win, char c)
         {
             cmd_buffer[cmd_index++] = c;
             cmd_buffer[cmd_index] = '\0';
+            terminal_write_char(c); // Echo
         }
     }
 }
 
-void terminal_init()
+void terminal_clear()
 {
     for (int i = 0; i < TERM_ROWS; i++) memset(term_buffer[i], 0, TERM_COLS + 1);
+    term_row = 0;
+    term_col = 0;
+}
+
+void terminal_init()
+{
+    terminal_clear();
     
     Window* win = wm_create_window(400, 50, 320, 260, "Terminal");
     if (win)
@@ -128,4 +140,11 @@ void terminal_init()
         win->on_paint = terminal_paint;
         win->on_key = terminal_key;
     }
+    
+    // Hook VGA output
+    vga_set_putc_hook(terminal_write_char);
+    vga_set_clrscr_hook(terminal_clear);
+    
+    // Print initial prompt
+    terminal_write_string("FloppyOS Terminal\n> ");
 }

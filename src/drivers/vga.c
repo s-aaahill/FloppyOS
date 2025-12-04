@@ -8,6 +8,19 @@ const uint8_t VGA_DEFAULT_COLOR = 0x07;
 uint8_t* g_VgaBuffer = (uint8_t*)0xB8000;
 int g_VgaX = 0, g_VgaY = 0;
 
+static void (*g_PutcHook)(char) = 0;
+static void (*g_ClrscrHook)() = 0;
+
+void vga_set_putc_hook(void (*hook)(char))
+{
+    g_PutcHook = hook;
+}
+
+void vga_set_clrscr_hook(void (*hook)())
+{
+    g_ClrscrHook = hook;
+}
+
 void vga_putentry(int x, int y, char c, uint8_t color)
 {
     const int index = 2 * (y * VGA_WIDTH + x);
@@ -26,6 +39,12 @@ void vga_set_cursor(int x, int y)
 
 void vga_clrscr()
 {
+    if (g_ClrscrHook)
+    {
+        g_ClrscrHook();
+        // Return if we want to suppress VGA clear, but clearing both is fine.
+    }
+
     for (int y = 0; y < VGA_HEIGHT; y++)
         for (int x = 0; x < VGA_WIDTH; x++)
             vga_putentry(x, y, '\0', VGA_DEFAULT_COLOR);
@@ -58,6 +77,14 @@ void vga_putc(char c)
     // Mirror to serial port 0x3F8 for headless testing
     while ((i686_inb(0x3F8 + 5) & 0x20) == 0);
     i686_outb(0x3F8, c);
+
+    if (g_PutcHook)
+    {
+        g_PutcHook(c);
+        // If we want to suppress VGA output when hooked, return here.
+        // For now, let's write to both (VGA memory might not be visible in GUI mode anyway).
+        return; 
+    }
 
     switch (c)
     {
