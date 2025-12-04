@@ -1,0 +1,29 @@
+Keyboard initialized.
+FloppyOS> help
+Available commands:
+  help    - Show this help
+  clear   - Clear screen
+  echo    - Print arguments
+  reboot  - Reboot system
+FloppyOS> echo 'hehhello world'
+'hello world'
+FloppyOS> echo skjdhvkj
+skjdhvkj
+FloppyOS> echo lauda
+lauda
+FloppyOS> help
+Available commands:
+  help    - Show this help
+  clear   - Clear screen
+  echo    - Print arguments
+  reboot  - Reboot system
+FloppyOS> clear
+FloppyOS> kjehw
+Unknown command. Type 'help'.
+FloppyOS> wfj
+Unknown command. Type 'help'.
+FloppyOS> cleafr
+FloppyOS> reboot
+Rebooting...
+Keyboard initialized.
+FloppyOS> 

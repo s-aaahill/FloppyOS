@@ -1,6 +1,6 @@
 include build_scripts/config.mk
 
-.PHONY: all floppy_image kernel bootloader clean always tools_fat
+.PHONY: all floppy_image kernel bootloader clean always tools_fat run
 
 all: floppy_image tools_fat
 
@@ -67,3 +67,11 @@ clean:
 	@$(MAKE) -C src/bootloader/stage2 BUILD_DIR=$(abspath $(BUILD_DIR)) clean
 	@$(MAKE) -C src/kernel BUILD_DIR=$(abspath $(BUILD_DIR)) clean
 	@rm -rf $(BUILD_DIR)/*
+
+IMG := build/main_floppy.img
+run:
+	if [ -f $(IMG) ]; then \
+		qemu-system-i386 -fda $(IMG) -boot a -serial file:serial.log ; \
+	else \
+		echo "Image not found: $(IMG)"; exit 1; \
+	fi

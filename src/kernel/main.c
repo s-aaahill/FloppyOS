@@ -3,6 +3,9 @@
 #include "memory.h"
 #include <hal/hal.h>
 #include <arch/i686/irq.h>
+#include <arch/i686/io.h>
+#include <drivers/keyboard.h>
+#include <drivers/vga.h>
 
 extern uint8_t __bss_start;
 extern uint8_t __end;
@@ -10,8 +13,12 @@ extern uint8_t __end;
 void crash_me();
 
 void timer(Registers* regs) {
-
-    //printf(".");
+    // Poll serial port for input (headless mode support)
+    if (i686_inb(0x3F8 + 5) & 1)
+    {
+        char c = i686_inb(0x3F8);
+        keyboard_process_char(c);
+    }
 }
 
 void __attribute__((section(".entry"))) start(uint16_t bootDrive)
@@ -22,7 +29,11 @@ void __attribute__((section(".entry"))) start(uint16_t bootDrive)
 
     clrscr();
 
-    printf("Control Flow in Kernel\nFloppyOS under development!!!\nCompleted till here on 4th December 2025\n");
+    //printf("Control Flow in Kernel\nFloppyOS under development!!!\nCompleted till here on 4th December 2025\n");
+    
+    keyboard_init();
+    printf("Keyboard initialized.\n");
+    printf("FloppyOS> ");
 
     i686_IRQ_RegisterHandler(0, timer);
 

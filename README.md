@@ -153,3 +153,13 @@ For educational use. Attribution appreciated but not required.
 ## 📬 Contact
 
 Open an issue on GitHub for questions or discussions.
+
+---
+
+## Quick Start
+
+```bash
+make
+./run.sh
+# or: make run
+```
