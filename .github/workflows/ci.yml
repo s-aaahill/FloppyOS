@@ -1,0 +1,15 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install deps
+        run: sudo apt update && sudo apt install -y nasm qemu-system-i386 make gcc-multilib
+      - name: Build
+        run: make
+      - name: Smoke run
+        run: qemu-system-i386 -fda build/main_floppy.img -nographic -monitor none -no-reboot -boot a -serial stdio -display none &
