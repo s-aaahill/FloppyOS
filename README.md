@@ -13,8 +13,12 @@
 * **GDT & IDT** — Global Descriptor Table & Interrupt Descriptor Table setup
 * **HAL** — Hardware Abstraction Layer initialization
 * **Freestanding Kernel (C + ASM)** — compiled with your custom `i686-elf-gcc` toolchain
+* **GUI System** — Simple Window Manager & Compositor with mouse support
+*   **Interactive Shell** — Basic command-line interface (`help`, `clear`, `echo`, `reboot`)
+*   **Drivers** — PS/2 Keyboard & Mouse, VGA Graphics
 * **Standard Library Support** — subset implementation (printf, puts, memory operations)
 * **VGA Text Output** — writes directly to `0xB8000`
+* **Framebuffer Graphics** — 800x600 32-bit color support (BGA)
 * **Floppy Image Build System** — generates a FAT12-compatible `test.img`
 * **Emulator Support** — run using QEMU or Bochs
 
@@ -25,11 +29,16 @@
 ```
 FloppyOS/
 ├── src/              # Kernel + low-level ASM
+│   ├── apps/         # User applications (Terminal, Notepad)
 │   ├── boot/         # Bootloader code
-│   └── kernel/       # C kernel source
-│       ├── arch/     # Architecture specific code (GDT, IDT, IO)
-│       ├── hal/      # Hardware Abstraction Layer
-│       └── util/     # Utilities
+│   ├── drivers/      # Hardware drivers (Keyboard, Mouse, VGA)
+│   ├── gui/          # Window Manager & Graphics
+│   ├── kernel/       # C kernel source
+│   │   ├── arch/     # Architecture specific code (GDT, IDT, IO)
+│   │   ├── hal/      # Hardware Abstraction Layer
+│   │   └── util/     # Utilities
+│   ├── shell/        # Command shell
+│   └── util/         # Shared utilities
 ├── tools/            # FAT12 image creation helpers
 │   └── fat/
 ├── toolchain/        # Custom-built i686-elf GCC toolchain
@@ -123,11 +132,10 @@ qemu-system-i386 -fda build/main_floppy.img
 
 ## 📌 Roadmap
 
-* Keyboard input driver
-* Better terminal interface
 * Paging and memory management
 * FAT12 improvements + file loading
 * PIT timer + IRQ handling
+* More GUI Applications
 
 ---
 
