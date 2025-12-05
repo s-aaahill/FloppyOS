@@ -44,9 +44,7 @@ int main(int argc, const char** argv)
         char buffer[100];
         while ((read = FAT_Read(&disk, fd, sizeof(buffer), buffer)))
         {
-            // for (uint32_t i = 0; i < read; i++)
-            //     putc(buffer[i], stdout);
-            // fflush(stdout);
+            continue;
         }
     }
     

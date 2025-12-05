@@ -15,11 +15,9 @@ void notepad_paint(Window* win)
     // Draw text
     draw_text(win->backbuffer, win->w, 5, 5, notepad_buffer, 0xFF000000, 0xFFFFFFFF);
     
-    // Draw cursor
-    // Calculate cursor position (very simple, no wrapping for MVP)
     int cx = 5 + (notepad_cursor * 8);
     int cy = 5;
-    // ...
+
 }
 
 void notepad_key(Window* win, char c)
@@ -45,7 +43,7 @@ void notepad_key(Window* win, char c)
 void notepad_init()
 {
     memset(notepad_buffer, 0, NOTEPAD_BUF_SIZE);
-    strcpy(notepad_buffer, "Welcome to Notepad!");
+    strcpy(notepad_buffer, "Start Typing on Your NotePad!");
     notepad_cursor = strlen(notepad_buffer);
     
     Window* win = wm_create_window(50, 50, 300, 200, "Notepad");

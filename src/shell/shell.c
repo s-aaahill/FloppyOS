@@ -4,8 +4,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-// Simple string functions
-// strcmp and strncmp moved to string.c
 
 void handle_line(const char* line)
 {
@@ -70,12 +68,6 @@ void handle_line(const char* line)
         // Method 2: Port 0x92 (Fast A20/Reset)
         // Bit 0: Fast Reset (1=Reset)
         i686_outb(0x92, i686_inb(0x92) | 1);
-        
-        // Method 3: Triple Fault
-        // Load invalid IDT
-        // struct { uint16_t limit; uint32_t ptr; } __attribute__((packed)) idtr = { 0, 0 };
-        // __asm__ volatile("lidt %0" : : "m"(idtr));
-        // __asm__ volatile("int3");
         
         // Halt if failed
         __asm__ volatile("hlt");

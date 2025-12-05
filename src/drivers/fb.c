@@ -92,10 +92,7 @@ void fb_blit(uint32_t* buffer, int x, int y, int w, int h)
 
 void fb_swap_buffers()
 {
-    // Copy backbuffer to framebuffer
-    // We can use a simple loop or optimized memcpy if available.
-    // Since we don't have a fast memcpy in kernel yet (byte-wise in memory.c),
-    // let's do a dword copy loop here for speed.
+
     uint32_t* src = g_BackBuffer;
     uint32_t* dst = g_FrameBuffer;
     int count = FB_WIDTH * FB_HEIGHT;

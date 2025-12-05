@@ -5,13 +5,8 @@
 #include <drivers/keyboard.h>
 #include <drivers/vga.h>
 
-// We need to hook into the shell output.
-// For MVP, we can just maintain a buffer here and have the shell write to it?
-// Or we can just simulate a terminal that sends commands to shell and displays output.
-// But the shell writes to VGA/Serial.
-// We should modify the shell/kernel to write to a "console" abstraction.
-// For this task, "When shell prints output, render it inside the terminal window’s backbuffer."
-// This implies we need a way to capture stdout.
+#define TERM_BG_COLOR 0xFF202020
+#define TERM_TEXT_COLOR 0xFFFFFFFF
 
 #define TERM_ROWS 25
 #define TERM_COLS 40
@@ -63,19 +58,19 @@ void terminal_write_string(const char* str)
 void terminal_paint(Window* win)
 {
     // Fill background (Black)
-    for (int i = 0; i < win->w * win->h; i++) win->backbuffer[i] = 0xFF000000;
+    for (int i = 0; i < win->w * win->h; i++) win->backbuffer[i] = TERM_BG_COLOR;
     
     // Draw text
     for (int i = 0; i < TERM_ROWS; i++)
     {
-        draw_text(win->backbuffer, win->w, 2, 2 + (i * 10), term_buffer[i], 0xFF00FF00, 0xFF000000);
+        draw_text(win->backbuffer, win->w, 2, 2 + (i * 10), term_buffer[i], TERM_TEXT_COLOR, TERM_BG_COLOR);
     }
     
     // Draw prompt/cursor line
     char line[TERM_COLS + 5];
     strcpy(line, "> ");
     strcat(line, cmd_buffer);
-    draw_text(win->backbuffer, win->w, 2, 2 + (term_row * 10), line, 0xFF00FF00, 0xFF000000);
+    draw_text(win->backbuffer, win->w, 2, 2 + (term_row * 10), line, TERM_TEXT_COLOR, TERM_BG_COLOR);
 }
 
 // Forward declaration
@@ -83,9 +78,6 @@ void handle_line(const char* line);
 
 #include <drivers/vga.h>
 
-// ... (rest of includes)
-
-// ... (terminal_write_char implementation)
 
 void terminal_key(Window* win, char c)
 {

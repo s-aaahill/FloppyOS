@@ -60,20 +60,9 @@ void wm_draw_window_frame(Window* win)
     uint32_t title_color = win->has_focus ? 0xFF000080 : 0xFF808080;
     fb_fill_rect(win->x, win->y - TITLE_BAR_HEIGHT, win->w, TITLE_BAR_HEIGHT, title_color);
     
-    // Draw title text
-    // We need a temp buffer for text drawing if we want to use draw_text, 
-    // but draw_text writes to a buffer. We can write directly to FB for title bar?
-    // Or we can use a small temp buffer. 
-    // Let's implement direct FB text drawing for title bar for simplicity or reuse draw_text with a trick.
-    // Actually, let's just draw pixel by pixel to FB for title.
-    
     int tx = win->x + 4;
     int ty = win->y - TITLE_BAR_HEIGHT + 4;
-    // Simple direct draw for title
-    // This is a bit hacky, better to have a function that draws to FB.
-    // But we can use the font renderer to draw to a small buffer on stack?
-    // No, stack is small.
-    // Let's just assume we can blit the window content.
+
 }
 
 void wm_draw_desktop()
@@ -90,16 +79,11 @@ void wm_draw_desktop()
         uint32_t title_color = win->has_focus ? 0xFF000080 : 0xFF808080;
         fb_fill_rect(win->x, win->y - TITLE_BAR_HEIGHT, win->w, TITLE_BAR_HEIGHT, title_color);
         
-        // Draw title text (hacky direct draw using font data)
-        // We really need a draw_text_fb function or similar.
-        // For now, let's skip text on title bar or implement a simple one.
         
         // Draw window content
         if (win->on_paint) win->on_paint(win);
         fb_blit(win->backbuffer, win->x, win->y, win->w, win->h);
         
-        // Draw border
-        // fb_rect(win->x-1, win->y-TITLE_BAR_HEIGHT-1, win->w+2, win->h+TITLE_BAR_HEIGHT+2, 0xFF000000);
     }
     
     // Draw mouse cursor

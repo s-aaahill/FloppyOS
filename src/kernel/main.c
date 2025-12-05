@@ -53,7 +53,7 @@ void __attribute__((section(".entry"))) start(uint16_t bootDrive)
     void terminal_init();
     terminal_init();
     
-    printf("Entering GUI Loop...\n");
+    printf("Entering Terminal...\n");
     // Main GUI Loop
     while (1)
     {
