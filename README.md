@@ -12,7 +12,7 @@
 * **Protected Mode** — sets up GDT and switches to 32‑bit mode
 * **GDT & IDT** — Global Descriptor Table & Interrupt Descriptor Table setup
 * **HAL** — Hardware Abstraction Layer initialization
-* **Freestanding Kernel (C + ASM)** — compiled with your custom `i686-elf-gcc` toolchain
+* **Freestanding Kernel (C + ASM)** — compiled with custom `i686-elf-gcc` toolchain
 * **GUI System** — Window Manager with **Splash Screen** & **Black Theme**
 *   **Interactive Shell** — Basic command-line interface (`help`, `clear`, `echo`, `reboot`)
 *   **Drivers** — PS/2 Keyboard (with **Shift & CapsLock**), Mouse, VGA Graphics
