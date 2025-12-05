@@ -13,9 +13,9 @@
 * **GDT & IDT** — Global Descriptor Table & Interrupt Descriptor Table setup
 * **HAL** — Hardware Abstraction Layer initialization
 * **Freestanding Kernel (C + ASM)** — compiled with your custom `i686-elf-gcc` toolchain
-* **GUI System** — Simple Window Manager & Compositor with mouse support
+* **GUI System** — Window Manager with **Splash Screen** & **Black Theme**
 *   **Interactive Shell** — Basic command-line interface (`help`, `clear`, `echo`, `reboot`)
-*   **Drivers** — PS/2 Keyboard & Mouse, VGA Graphics
+*   **Drivers** — PS/2 Keyboard (with **Shift & CapsLock**), Mouse, VGA Graphics
 * **Standard Library Support** — subset implementation (printf, puts, memory operations)
 * **VGA Text Output** — writes directly to `0xB8000`
 * **Framebuffer Graphics** — 800x600 32-bit color support (BGA)
