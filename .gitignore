@@ -2,4 +2,4 @@ build/
 toolchain/
 *.err
 bx_enh_dbg.ini
-serial.logserial.log
+serial.log
