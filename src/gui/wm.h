@@ -28,3 +28,4 @@ void wm_draw_desktop();
 void wm_handle_mouse_event(int x, int y, uint8_t buttons);
 void wm_handle_key_event(char c);
 void wm_set_focus(Window* win);
+void gui_show_splash(int ms);

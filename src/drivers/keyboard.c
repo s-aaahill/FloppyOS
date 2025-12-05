@@ -22,26 +22,25 @@ static const char g_ScancodeToChar[] = {
     '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 0, '*', 0, ' '
 };
 
+static bool g_ShiftDown = false;
+static bool g_CapsLock = false;
+
 void keyboard_process_char(char c)
 {
     wm_handle_key_event(c);
-    
-    /* Legacy CLI handling
-    if (c == '\n' || c == '\r')
-    {
-        vga_putc('\n');
-    ...
-    */
 }
 
 void keyboard_handler_c(Registers* regs)
 {
     // EOI handled by IRQ handler wrapper usually, but here we are called from ISR stub.
     // We need to send EOI manually.
-    // i686_outb(0x20, 0x20); // This is what SendEndofInterrupt does for master PIC.
 
     uint8_t scancode = i686_inb(KEYBOARD_DATA_PORT);
-    // printf("KBD: %x\n", scancode); // Commented out to avoid spam, but useful for debug
+    
+    // Handle modifiers
+    if (scancode == 0x2A || scancode == 0x36) g_ShiftDown = true;
+    else if (scancode == 0xAA || scancode == 0xB6) g_ShiftDown = false;
+    else if (scancode == 0x3A) g_CapsLock = !g_CapsLock;
 
     if (scancode & 0x80)
     {
@@ -57,14 +56,32 @@ void keyboard_handler_c(Registers* regs)
 
         if (c)
         {
-            wm_handle_key_event(c);
-            
-            /* Legacy CLI handling
-            if (c == '\n' || c == '\r')
+            // Apply Shift/Caps logic
+            if (c >= 'a' && c <= 'z')
             {
-                vga_putc('\n');
-            ...
-            */
+                if (g_ShiftDown ^ g_CapsLock)
+                {
+                    c = c - 32; // To uppercase
+                }
+            }
+            // Basic symbol support
+            else if (g_ShiftDown)
+            {
+                if (c == '1') c = '!';
+                else if (c == '9') c = '(';
+                else if (c == '0') c = ')';
+                else if (c == '-') c = '_';
+                else if (c == '=') c = '+';
+                else if (c == '[') c = '{';
+                else if (c == ']') c = '}';
+                else if (c == ';') c = ':';
+                else if (c == '\'') c = '"';
+                else if (c == ',') c = '<';
+                else if (c == '.') c = '>';
+                else if (c == '/') c = '?';
+            }
+
+            wm_handle_key_event(c);
         }
     }
 

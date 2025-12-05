@@ -54,6 +54,10 @@ void __attribute__((section(".entry"))) start(uint16_t bootDrive)
     terminal_init();
     
     printf("Entering Terminal...\n");
+    
+    // Show splash screen
+    gui_show_splash(5000);
+    
     // Main GUI Loop
     while (1)
     {

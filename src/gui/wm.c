@@ -5,12 +5,13 @@
 #include <drivers/keyboard.h> // For keyboard_process_char hook
 #include <stddef.h>
 #include <string.h>
+#include <stdio.h>
 
 static Window g_Windows[MAX_WINDOWS];
 static int g_WindowCount = 0;
 static Window* g_FocusedWindow = NULL;
 
-// Simple static buffers for windows (MVP constraint: no malloc)
+// Simple static buffers for windows 
 #define MAX_WINDOW_PIXELS (640 * 480) 
 static uint32_t g_WindowBuffers[MAX_WINDOWS][MAX_WINDOW_PIXELS];
 
@@ -65,10 +66,13 @@ void wm_draw_window_frame(Window* win)
 
 }
 
+
+#define DESKTOP_BG_COLOR 0xFF000000
+
 void wm_draw_desktop()
 {
     // Draw background
-    fb_fill_rect(0, 0, fb_width(), fb_height(), 0xFF008080); // Teal background
+    fb_fill_rect(0, 0, fb_width(), fb_height(), DESKTOP_BG_COLOR); // Soft pastel background
 
     // Draw windows
     for (int i = 0; i < g_WindowCount; i++)
@@ -147,4 +151,41 @@ void wm_handle_key_event(char c)
     {
         g_FocusedWindow->on_key(g_FocusedWindow, c);
     }
+}
+
+void gui_show_splash(int ms)
+{
+    //printf("Showing Splash Screen for %d ms...\n", ms);
+    // Fill background
+    fb_fill_rect(0, 0, fb_width(), fb_height(), DESKTOP_BG_COLOR);
+    
+    // Draw centered text
+    const char* title = "FloppyOS";
+    const char* subtitle = "Loading...";
+    
+    // Simple centering math (assuming 8x8 font)
+    int title_x = (fb_width() - (strlen(title) * 8)) / 2;
+    int title_y = (fb_height() / 2) - 20;
+    
+    int sub_x = (fb_width() - (strlen(subtitle) * 8)) / 2;
+    int sub_y = (fb_height() / 2) + 10;
+    
+    // Use black text for title, dark gray for subtitle
+    draw_text(fb_get_backbuffer(), fb_width(), title_x, title_y, title, 0xFF000000, DESKTOP_BG_COLOR);
+    draw_text(fb_get_backbuffer(), fb_width(), sub_x, sub_y, subtitle, 0xFF404040, DESKTOP_BG_COLOR);
+    
+    fb_swap_buffers();
+    
+    // Fallback busy-wait loop
+    // Calibrate roughly for QEMU/real hardware. 
+    // A simple volatile loop prevents optimization.
+    volatile int count = 0;
+    // 2000ms * some constant. 
+    // Let's assume a fairly large number of iterations per ms.
+    int iterations = ms * 100000; 
+    for (int i = 0; i < iterations; i++)
+    {
+        count++;
+    }
+    //printf("Booting...\n");
 }

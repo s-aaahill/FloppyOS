@@ -1,5 +1,8 @@
 #include "fb.h"
 #include <arch/i686/io.h>
+#include <stdio.h>
+
+
 
 // Bochs Graphics Adapter (BGA) ports
 #define VBE_DISPI_IOPORT_INDEX 0x01CE
@@ -101,4 +104,9 @@ void fb_swap_buffers()
     {
         *dst++ = *src++;
     }
+}
+
+uint32_t* fb_get_backbuffer()
+{
+    return g_BackBuffer;
 }
