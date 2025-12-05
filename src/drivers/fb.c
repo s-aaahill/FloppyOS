@@ -50,9 +50,6 @@ void fb_init()
     bga_write_register(VBE_DISPI_INDEX_BPP, FB_BPP);
     bga_write_register(VBE_DISPI_INDEX_ENABLE, VBE_DISPI_ENABLED | VBE_DISPI_LFB_ENABLED);
     
-    // Note: In a real kernel we should read PCI BAR to get LFB address.
-    // For QEMU/Bochs default, 0xE0000000 is usually correct for the first video device.
-    // Let's try to verify if BGA is available by reading version
     uint16_t version = bga_read_register(VBE_DISPI_INDEX_ID);
     printf("BGA Version: 0x%x\n", version);
 }
