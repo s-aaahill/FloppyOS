@@ -1,6 +1,6 @@
 # FloppyOS
 
-**Tiny hobby operating system that boots from a floppy image, switches to 32-bit protected mode, and writes text to VGA memory.**
+**Tiny hobby operating system that boots from a floppy image, switches to 32-bit protected mode, and Creates Window GUI to VGA memory.**
 
 > This repository exists for learning OS dev basics: real mode → protected mode, freestanding C, custom GCC toolchain, floppy images, and simple hardware interaction.
 
