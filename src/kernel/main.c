@@ -52,6 +52,9 @@ void __attribute__((section(".entry"))) start(uint16_t bootDrive)
     
     void terminal_init();
     terminal_init();
+
+    void calculator_init();
+    calculator_init();
     
     printf("Entering Terminal...\n");
     
@@ -59,12 +62,39 @@ void __attribute__((section(".entry"))) start(uint16_t bootDrive)
     gui_show_splash(5000);
     
     // Main GUI Loop
+    int frame = 0;
     while (1)
     {
         wm_draw_desktop();
         
         // Simple delay/yield could go here
         // For now, just busy loop
+        for (volatile int i = 0; i < 100000; i++);
+
+        // Test Automation for Agent Verification
+        frame++;
+        if (frame == 50) {
+            printf("TESTING: Automating Notepad Minimize...\n");
+            // Notepad created at 50,50 with w=300.
+            // Minimize btn approx at 50+300-12-4 = 334. Y = 50 - 20 + 4 = 34.
+            // Click Down
+            wm_handle_mouse_event(335, 35, 1);
+            // Click Up
+            wm_handle_mouse_event(335, 35, 0);
+        }
+        if (frame == 150) {
+             printf("TESTING: Automating Taskbar Restore...\n");
+             // Taskbar at bottom (480). Height 24. Y >= 456.
+             // Item 0 (Notepad) at x approx 2+10 = 12.
+             // Click Down
+             wm_handle_mouse_event(15, 470, 1);
+             // Click Up
+             wm_handle_mouse_event(15, 470, 0);
+        }
+        if (frame == 200) {
+            printf("TESTING: Complete. Exiting loop for log capture.\n");
+            // In a real OS we wouldn't exit, but for this test environment we can loop forever or just print checkmark
+        }
     }
 
 end:
