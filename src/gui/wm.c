@@ -1,4 +1,5 @@
 #include "wm.h"
+#include "wallpaper.h"
 #include <drivers/fb.h>
 #include <drivers/font.h>
 #include <drivers/ps2mouse.h>
@@ -135,12 +136,14 @@ void wm_draw_window_frame(Window* win)
 }
 
 
-#define DESKTOP_BG_COLOR 0xFF000000
+#define DESKTOP_BG_COLOR 0xFF000080
 
 void wm_draw_desktop()
 {
     // Draw background
-    fb_fill_rect(0, 0, fb_width(), fb_height(), DESKTOP_BG_COLOR); // Soft pastel background
+    // Draw background
+    // fb_fill_rect(0, 0, fb_width(), fb_height(), DESKTOP_BG_COLOR); // Soft pastel background
+    wallpaper_render(fb_width(), fb_height());
 
     // Draw windows
     for (int i = 0; i < g_WindowCount; i++)

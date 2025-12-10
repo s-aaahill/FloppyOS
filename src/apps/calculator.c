@@ -102,6 +102,7 @@ void calc_paint(Window* win)
 
 void calc_mouse(Window* win, int x, int y, uint8_t buttons)
 {
+    printf("Calc Mouse: %d,%d btn=%d\n", x, y, buttons);
     static uint8_t last_buttons = 0;
     if ((buttons & 1) && !(last_buttons & 1)) { // Click
         int start_x = 10;
@@ -156,9 +157,24 @@ void calc_mouse(Window* win, int x, int y, uint8_t buttons)
                      // "1", "2", "3", "C",
                      // "=", "0", ".", ""
                      
-                     pending_val = str_to_int(calc_display);
+                     // Calculate pending if we already have one
+                     if (pending_op != 0 && !new_entry) {
+                         current_val = str_to_int(calc_display);
+                         long long res = pending_val;
+                         if (pending_op == '+') res = pending_val + current_val;
+                         else if (pending_op == '-') res = pending_val - current_val;
+                         else if (pending_op == '*') res = pending_val * current_val; // minimal support
+                         else if (pending_op == '/') { if(current_val != 0) res = pending_val / current_val; }
+                         
+                         int_to_str(res, calc_display);
+                         pending_val = res;
+                     } else {
+                         pending_val = str_to_int(calc_display);
+                     }
+                     
                      pending_op = ch;
                      new_entry = true;
+                     printf("Calc: Op '%c', Pending Val: %d\n", pending_op, (int)pending_val);
                 }
                 else if (ch == '=') {
                     current_val = str_to_int(calc_display);
@@ -188,5 +204,8 @@ void calculator_init()
     if (calc_win) {
         calc_win->on_paint = calc_paint;
         calc_win->on_mouse = calc_mouse;
+        printf("Calculator initialized: Win %p\n", calc_win);
+    } else {
+        printf("Calculator failed to create window!\n");
     }
 }
