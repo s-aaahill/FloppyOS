@@ -103,8 +103,7 @@ void calc_paint(Window* win)
 void calc_mouse(Window* win, int x, int y, uint8_t buttons)
 {
     printf("Calc Mouse: %d,%d btn=%d\n", x, y, buttons);
-    static uint8_t last_buttons = 0;
-    if ((buttons & 1) && !(last_buttons & 1)) { // Click
+    if ((buttons & 1)) { // Click
         int start_x = 10;
         int start_y = 50;
         int btn_w = 30;
@@ -195,7 +194,6 @@ void calc_mouse(Window* win, int x, int y, uint8_t buttons)
             }
         }
     }
-    last_buttons = buttons;
 }
 
 void calculator_init()
