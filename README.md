@@ -13,7 +13,7 @@
 * **GDT & IDT** — Global Descriptor Table & Interrupt Descriptor Table setup
 * **HAL** — Hardware Abstraction Layer initialization
 * **Freestanding Kernel (C + ASM)** — compiled with custom `i686-elf-gcc` toolchain
-* **GUI System** — Window Manager with **Splash Screen** & **Black Theme**
+* **GUI System** — Window Manager with **Splash Screen** & **Desktop Wallpaper**
 *   **Interactive Shell** — Basic command-line interface (`help`, `clear`, `echo`, `reboot`)
 *   **Drivers** — PS/2 Keyboard (with **Shift & CapsLock**), Mouse, VGA Graphics
 * **Standard Library Support** — subset implementation (printf, puts, memory operations)
@@ -29,7 +29,7 @@
 ```
 FloppyOS/
 ├── src/              # Kernel + low-level ASM
-│   ├── apps/         # User applications (Terminal, Notepad)
+│   ├── apps/         # User applications (Terminal, Notepad, Calculator)
 │   ├── boot/         # Bootloader code
 │   ├── drivers/      # Hardware drivers (Keyboard, Mouse, VGA)
 │   ├── gui/          # Window Manager & Graphics
