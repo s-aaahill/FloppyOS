@@ -15,6 +15,7 @@
 * **Freestanding Kernel (C + ASM)** — compiled with custom `i686-elf-gcc` toolchain
 * **GUI System** — Window Manager with **Splash Screen** & **Desktop Wallpaper**
 *   **Interactive Shell** — Basic command-line interface (`help`, `clear`, `echo`, `reboot`)
+*   **Applications** — Terminal, Notepad, Calculator, **Snake Game**
 *   **Drivers** — PS/2 Keyboard (with **Shift & CapsLock**), Mouse, VGA Graphics
 * **Standard Library Support** — subset implementation (printf, puts, memory operations)
 * **VGA Text Output** — writes directly to `0xB8000`
@@ -29,7 +30,7 @@
 ```
 FloppyOS/
 ├── src/              # Kernel + low-level ASM
-│   ├── apps/         # User applications (Terminal, Notepad, Calculator)
+│   ├── apps/         # User applications (Terminal, Notepad, Calculator, Snake)
 │   ├── boot/         # Bootloader code
 │   ├── drivers/      # Hardware drivers (Keyboard, Mouse, VGA)
 │   ├── gui/          # Window Manager & Graphics
