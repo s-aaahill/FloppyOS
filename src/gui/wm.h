@@ -10,6 +10,7 @@ typedef struct Window Window;
 typedef void (*PaintCallback)(Window* win);
 typedef void (*KeyCallback)(Window* win, char c);
 typedef void (*MouseCallback)(Window* win, int x, int y, uint8_t buttons);
+typedef void (*TickCallback)(Window* win);
 
 struct Window {
     int x, y, w, h;
@@ -22,6 +23,7 @@ struct Window {
     PaintCallback on_paint;
     KeyCallback on_key;
     MouseCallback on_mouse;
+    TickCallback on_tick;
 };
 
 void wm_init();
@@ -29,6 +31,7 @@ Window* wm_create_window(int x, int y, int w, int h, const char* title);
 void wm_draw_desktop();
 void wm_handle_mouse_event(int x, int y, uint8_t buttons);
 void wm_handle_key_event(char c);
+void wm_tick();
 void wm_set_focus(Window* win);
 void wm_minimize(Window* win);
 void wm_restore(Window* win);

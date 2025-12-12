@@ -46,6 +46,7 @@ Window* wm_create_window(int x, int y, int w, int h, const char* title)
     win->on_paint = NULL;
     win->on_key = NULL;
     win->on_mouse = NULL;
+    win->on_tick = NULL;
     
     // Clear backbuffer
     for (int i = 0; i < w * h; i++) win->backbuffer[i] = 0xFFFFFFFF; // White background
@@ -284,6 +285,18 @@ void wm_handle_key_event(char c)
     if (g_FocusedWindow && g_FocusedWindow->on_key)
     {
         g_FocusedWindow->on_key(g_FocusedWindow, c);
+    }
+}
+
+void wm_tick()
+{
+    for (int i = 0; i < g_WindowCount; i++)
+    {
+        Window* win = &g_Windows[i];
+        if (!win->minimized && win->on_tick)
+        {
+            win->on_tick(win);
+        }
     }
 }
 

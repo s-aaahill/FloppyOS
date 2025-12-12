@@ -55,6 +55,9 @@ void __attribute__((section(".entry"))) start(uint16_t bootDrive)
 
     void calculator_init();
     calculator_init();
+
+    void snake_init();
+    snake_init();
     
     printf("Entering Terminal...\n");
     
@@ -66,6 +69,7 @@ void __attribute__((section(".entry"))) start(uint16_t bootDrive)
     while (1)
     {
         wm_draw_desktop();
+        wm_tick();
         
         // Simple delay/yield could go here
         // For now, just busy loop
