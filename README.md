@@ -13,7 +13,8 @@
 * **GDT & IDT** — Global Descriptor Table & Interrupt Descriptor Table setup
 * **HAL** — Hardware Abstraction Layer initialization
 * **Freestanding Kernel (C + ASM)** — compiled with custom `i686-elf-gcc` toolchain
-* **GUI System** — Window Manager with **Splash Screen** & **Desktop Wallpaper**
+* **Robust Bootloader** — supports loading large kernels (>64KB) via FAT12
+* **GUI System** — Window Manager with **Splash Screen** & **Custom Bitmap Wallpaper**
 *   **Interactive Shell** — Basic command-line interface (`help`, `clear`, `echo`, `reboot`)
 *   **Applications** — Terminal, Notepad, Calculator, **Snake Game**
 *   **Drivers** — PS/2 Keyboard (with **Shift & CapsLock**), Mouse, VGA Graphics
