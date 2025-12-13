@@ -203,6 +203,156 @@ void printf(const char* fmt, ...)
     va_end(args);
 }
 
+void sprintf(char* buffer, const char* fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+
+    int state = PRINTF_STATE_NORMAL;
+    int length = PRINTF_LENGTH_DEFAULT;
+    int radix = 10;
+    bool sign = false;
+    bool number = false;
+    int pos = 0;
+
+    while (*fmt)
+    {
+        switch (state)
+        {
+            case PRINTF_STATE_NORMAL:
+                switch (*fmt)
+                {
+                    case '%':   state = PRINTF_STATE_LENGTH;
+                                break;
+                    default:    buffer[pos++] = *fmt;
+                                break;
+                }
+                break;
+
+            case PRINTF_STATE_LENGTH:
+                switch (*fmt)
+                {
+                    case 'h':   length = PRINTF_LENGTH_SHORT;
+                                state = PRINTF_STATE_LENGTH_SHORT;
+                                break;
+                    case 'l':   length = PRINTF_LENGTH_LONG;
+                                state = PRINTF_STATE_LENGTH_LONG;
+                                break;
+                    default:    goto SPRINTF_STATE_SPEC_;
+                }
+                break;
+
+            case PRINTF_STATE_LENGTH_SHORT:
+                if (*fmt == 'h')
+                {
+                    length = PRINTF_LENGTH_SHORT_SHORT;
+                    state = PRINTF_STATE_SPEC;
+                }
+                else goto SPRINTF_STATE_SPEC_;
+                break;
+
+            case PRINTF_STATE_LENGTH_LONG:
+                if (*fmt == 'l')
+                {
+                    length = PRINTF_LENGTH_LONG_LONG;
+                    state = PRINTF_STATE_SPEC;
+                }
+                else goto SPRINTF_STATE_SPEC_;
+                break;
+
+            case PRINTF_STATE_SPEC:
+            SPRINTF_STATE_SPEC_:
+                switch (*fmt)
+                {
+                    case 'c':   buffer[pos++] = (char)va_arg(args, int);
+                                break;
+
+                    case 's':   
+                                {
+                                    const char* s = va_arg(args, const char*);
+                                    while(*s) buffer[pos++] = *s++;
+                                }
+                                break;
+
+                    case '%':   buffer[pos++] = '%';
+                                break;
+
+                    case 'd':
+                    case 'i':   radix = 10; sign = true; number = true;
+                                break;
+
+                    case 'u':   radix = 10; sign = false; number = true;
+                                break;
+
+                    case 'X':
+                    case 'x':
+                    case 'p':   radix = 16; sign = false; number = true;
+                                break;
+
+                    case 'o':   radix = 8; sign = false; number = true;
+                                break;
+
+                    default:    break;
+                }
+
+                if (number)
+                {
+                    char num_buffer[32];
+                    int num_pos = 0;
+                    unsigned long long num_val = 0;
+                    bool is_neg = false;
+
+                    if (sign)
+                    {
+                        long long val = 0;
+                         switch (length)
+                        {
+                        case PRINTF_LENGTH_SHORT_SHORT:
+                        case PRINTF_LENGTH_SHORT:
+                        case PRINTF_LENGTH_DEFAULT:     val = va_arg(args, int); break;
+                        case PRINTF_LENGTH_LONG:        val = va_arg(args, long); break;
+                        case PRINTF_LENGTH_LONG_LONG:   val = va_arg(args, long long); break;
+                        }
+                        if (val < 0) { is_neg = true; num_val = -val; }
+                        else num_val = val;
+                    }
+                    else
+                    {
+                        switch (length)
+                        {
+                        case PRINTF_LENGTH_SHORT_SHORT:
+                        case PRINTF_LENGTH_SHORT:
+                        case PRINTF_LENGTH_DEFAULT:     num_val = va_arg(args, unsigned int); break;
+                        case PRINTF_LENGTH_LONG:        num_val = va_arg(args, unsigned long); break;
+                        case PRINTF_LENGTH_LONG_LONG:   num_val = va_arg(args, unsigned long long); break;
+                        }
+                    }
+
+                    do 
+                    {
+                        unsigned long long rem = num_val % radix;
+                        num_val /= radix;
+                        num_buffer[num_pos++] = g_HexChars[rem];
+                    } while (num_val > 0);
+
+                    if (is_neg) buffer[pos++] = '-';
+                    while (--num_pos >= 0) buffer[pos++] = num_buffer[num_pos];
+                }
+
+                state = PRINTF_STATE_NORMAL;
+                length = PRINTF_LENGTH_DEFAULT;
+                radix = 10;
+                sign = false;
+                number = false;
+                break;
+        }
+
+        fmt++;
+    }
+    buffer[pos] = '\0';
+    va_end(args);
+}
+
 void print_buffer(const char* msg, const void* buffer, uint32_t count)
 {
     const uint8_t* u8Buffer = (const uint8_t*)buffer;

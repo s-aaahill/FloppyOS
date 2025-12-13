@@ -7,6 +7,7 @@
 #include <arch/i686/pic.h>
 #include <shell/shell.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #define KEYBOARD_DATA_PORT 0x60
 

@@ -4,6 +4,8 @@
 #include <drivers/font.h>
 #include <drivers/ps2mouse.h>
 #include <drivers/keyboard.h> // For keyboard_process_char hook
+#include <mm/memstats.h>
+#include <kernel/memory.h>
 #include <stddef.h>
 #include <string.h>
 #include <stdio.h>
@@ -12,9 +14,9 @@ static Window g_Windows[MAX_WINDOWS];
 static int g_WindowCount = 0;
 static Window* g_FocusedWindow = NULL;
 
-// Simple static buffers for windows 
-#define MAX_WINDOW_PIXELS (640 * 480) 
-static uint32_t g_WindowBuffers[MAX_WINDOWS][MAX_WINDOW_PIXELS];
+// Dynamic buffers
+// static uint32_t g_WindowBuffers[MAX_WINDOWS][MAX_WINDOW_PIXELS]; // Removed static
+
 
 #define MAX_TASKBAR_ITEMS 10
 struct Taskbar {
@@ -41,7 +43,16 @@ Window* wm_create_window(int x, int y, int w, int h, const char* title)
     win->w = w;
     win->h = h;
     strncpy(win->title, title, 31);
-    win->backbuffer = g_WindowBuffers[g_WindowCount];
+    
+    // Allocate backbuffer
+    uint32_t size = w * h * 4;
+    win->backbuffer = (uint32_t*)kalloc_raw(size);
+    
+    // Track Stats
+    memstats.backbuffer_bytes += size;
+    memstats.used_ram_bytes += size;
+    memstats.free_ram_bytes -= size;
+
     win->has_focus = false;
     win->on_paint = NULL;
     win->on_key = NULL;
@@ -49,7 +60,9 @@ Window* wm_create_window(int x, int y, int w, int h, const char* title)
     win->on_tick = NULL;
     
     // Clear backbuffer
-    for (int i = 0; i < w * h; i++) win->backbuffer[i] = 0xFFFFFFFF; // White background
+    if (win->backbuffer) {
+         for (int i = 0; i < w * h; i++) win->backbuffer[i] = 0xFFFFFFFF; // White background
+    }
 
     win->minimized = false;
     win->taskbar_index = -1;

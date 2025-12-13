@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "stdio.h"
 #include "memory.h"
+#include <string.h>
 #include <hal/hal.h>
 #include <arch/i686/irq.h>
 #include <arch/i686/io.h>
@@ -37,6 +38,9 @@ void __attribute__((section(".entry"))) start(uint16_t bootDrive)
     clrscr();
 
     // Initialize GUI
+    printf("Initializing Memory...\n");
+    mem_init();
+
     printf("Initializing FB...\n");
     fb_init();
     printf("Initializing WM...\n");
@@ -58,6 +62,10 @@ void __attribute__((section(".entry"))) start(uint16_t bootDrive)
 
     void snake_init();
     snake_init();
+    
+    void taskmgr_init();
+    taskmgr_init();
+
     
     printf("Entering Terminal...\n");
     

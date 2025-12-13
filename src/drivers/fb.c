@@ -1,6 +1,7 @@
 #include "fb.h"
 #include <arch/i686/io.h>
 #include <stdio.h>
+#include <mm/memstats.h>
 
 
 
@@ -52,6 +53,20 @@ void fb_init()
     
     uint16_t version = bga_read_register(VBE_DISPI_INDEX_ID);
     printf("BGA Version: 0x%x\n", version);
+
+    // Track memory
+    // Default 800x600x32bpp = 1,920,000 bytes.
+    // Plus backbuffer at 10MB (static in fb.c but it consumes RAM).
+    uint32_t fb_size = FB_WIDTH * FB_HEIGHT * 4;
+    // We have VRAM (hardware) and Backbuffer (RAM).
+    // The prompt says: "Calculate framebuffer_bytes = width x height x bytes_per_pixel. Add to used_ram_bytes..."
+    // "If a desktop background buffer exists, count it as framebuffer memory as well."
+    // In fb.c, g_BackBuffer is at 0x00A00000 (10MB mark). This is part of system RAM.
+    
+    // We count the system RAM backbuffer.
+    memstats.framebuffer_bytes += fb_size;
+    memstats.used_ram_bytes += fb_size;
+    memstats.free_ram_bytes -= fb_size;
 }
 
 int fb_width() { return FB_WIDTH; }
