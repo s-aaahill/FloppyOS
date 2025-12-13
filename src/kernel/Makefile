@@ -14,8 +14,7 @@ SOURCES_C = $(wildcard *.c) \
 			$(wildcard ../drivers/*.c) \
 			$(wildcard ../shell/*.c) \
 			$(wildcard ../gui/*.c) \
-			$(wildcard ../apps/*.c) \
-			arch/i686/isrs_gen.c
+			$(wildcard ../apps/*.c)
 
 OBJECTS_C = $(patsubst %.c, $(BUILD_DIR)/kernel/c/%.obj, $(SOURCES_C))
 
@@ -35,8 +34,8 @@ all: kernel
 
 kernel: $(BUILD_DIR)/kernel.bin
 
-$(BUILD_DIR)/kernel.bin: $(OBJECTS_ASM) $(OBJECTS_C)
-	@$(TARGET_LD) $(TARGET_LINKFLAGS) -Wl,-Map=$(BUILD_DIR)/kernel.map -o $@ $^ $(TARGET_LIBS)
+$(BUILD_DIR)/kernel.bin: $(OBJECTS_ASM) $(OBJECTS_C) ../gui/wallpaper_img.o
+	@$(TARGET_LD) $(TARGET_LINKFLAGS) -Wl,-Map=$(BUILD_DIR)/kernel.map -o $@ $(OBJECTS_ASM) $(OBJECTS_C) ../gui/wallpaper_img.o $(TARGET_LIBS)
 	@echo "--> Created:  kernel.bin"
 
 $(BUILD_DIR)/kernel/c/%.obj: %.c $(HEADERS_C)

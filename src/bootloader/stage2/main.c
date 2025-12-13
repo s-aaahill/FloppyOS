@@ -29,6 +29,7 @@ void __attribute__((cdecl)) start(uint16_t bootDrive)
     }
 
     // load kernel
+    printf("Loading kernel...\r\n");
     FAT_File* fd = FAT_Open(&disk, "/kernel.bin");
     uint32_t read;
     uint8_t* kernelBuffer = Kernel;
@@ -36,10 +37,13 @@ void __attribute__((cdecl)) start(uint16_t bootDrive)
     {
         memcpy(kernelBuffer, KernelLoadBuffer, read);
         kernelBuffer += read;
+        printf(".");
     }
+    printf("\r\n");
     FAT_Close(fd);
 
     // execute kernel
+    printf("Jumping into kernel...\r\n");
     KernelStart kernelStart = (KernelStart)Kernel;
     kernelStart();
 
