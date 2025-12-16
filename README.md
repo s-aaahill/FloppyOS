@@ -21,7 +21,7 @@
 * **Standard Library Support** — subset implementation (printf, puts, memory operations)
 * **VGA Text Output** — writes directly to `0xB8000`
 * **Framebuffer Graphics** — 800x600 32-bit color support (BGA)
-* **Floppy Image Build System** — generates a FAT12-compatible `test.img`
+* **Floppy Image Build System** — generates a FAT12-compatible `main_floppy.img`
 * **Emulator Support** — run using QEMU or Bochs
 
 ---
