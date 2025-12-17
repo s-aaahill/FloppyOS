@@ -61,7 +61,7 @@ Install basic build tools:
 
 ```bash
 sudo apt update
-sudo apt install -y nasm make qemu-system-i386 bochs bochs-sdl
+sudo apt install -y nasm make qemu-system-i386 bochs bochs-sdl build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo curl
 ```
 
 This project uses **Own built GCC cross-compiler**, built in the `toolchain/` directory.
@@ -70,26 +70,20 @@ This project uses **Own built GCC cross-compiler**, built in the `toolchain/` di
 
 ## 🛠 GCC Cross-Compiler (Custom Toolchain)
 
-The Makefile expects binaries at:
-
-```
-./toolchain/i686-elf/bin/i686-elf-gcc
-./toolchain/i686-elf/bin/i686-elf-ld
-```
-
-Set the compiler variables accordingly:
-
-```
-CC = ./toolchain/i686-elf/bin/i686-elf-gcc
-AS = nasm
-LD = ./toolchain/i686-elf/bin/i686-elf-ld
-```
-
-Ensure the binaries are executable:
+This project requires a custom i686-elf toolchain. You can build it automatically:
 
 ```bash
-chmod +x toolchain/i686-elf/bin/*
+make toolchain
 ```
+
+This command will:
+1. Download GCC and Binutils
+2. Download prerequisites (using `curl` from generic GNU mirrors)
+3. Compile and install them into the `toolchain/` directory
+
+Once built, the Makefile automatically uses the compilers at:
+* `./toolchain/i686-elf/bin/i686-elf-gcc`
+* `./toolchain/i686-elf/bin/i686-elf-ld`
 
 ---
 
@@ -169,6 +163,7 @@ Open an issue on GitHub for questions or discussions.
 ## Quick Start
 
 ```bash
+make toolchain  # Only first time
 make
 ./run.sh
 # or: make run
